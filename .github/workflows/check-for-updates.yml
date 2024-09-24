@@ -80,7 +80,6 @@ jobs:
             echo "More than one new file added in news.d, failing the job."
             exit 1
           fi
-          echo "::set-output name=changes_detected::true"
           echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
 
           # Extract TZDATA_VERSION from filename
@@ -94,17 +93,17 @@ jobs:
 
       - name: Create PR
         id: commit_changes
-        if: steps.check_changes.outputs.changes_detected == 'true'
+        if: env.CHANGES_DETECTED == 'true'
         run: |
-          git checkout -b "updates/update_${TZDATA_VERSION}"
+          # git checkout -b "updates/update_${TZDATA_VERSION}"
           git commit -m "Update tzdata to version $TZDATA_VERSION" \
                      -m "$TZDATA_NEWS"
-          git push --force origin "updates/update_${TZDATA_VERSION}"
+          # git push --force origin "updates/update_${TZDATA_VERSION}"
 
       - name: Create pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.check_changes.outputs.changes_detected == 'true'
+        if: env.CHANGES_DETECTED == 'true'
         run: |
           gh pr create --title "Update tzdata to version $TZDATA_VERSION" \
             --body "$TZDATA_NEWS" \
