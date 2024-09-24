@@ -32,6 +32,7 @@ jobs:
     needs: check-pr-exists
     permissions:
       pull-requests: write
+      contents: write
     if: needs.check-pr-exists.outputs.pr_exists == 'false'  # Run only if no PR exists
     steps:
       - name: Check out repository (shallow)
