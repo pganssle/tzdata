@@ -21,10 +21,10 @@ jobs:
                       --json number --jq '.[] | .number')
           if [ -n "$PR_EXISTS" ]; then
             echo "A PR updating the tzdata version already exists: https://github.com/python/tzdata/pulls/${PR_EXISTS}"
-            echo "::set-output name=pr_exists::true"
+            echo "pr_exists=true" >> $GITHUB_OUTPUT
             exit 0
           else
-            echo "::set-output name=pr_exists::false"
+            echo "pr_exists=false" >> $GITHUB_OUTPUT
           fi
 
   check-for-updates:
@@ -32,10 +32,7 @@ jobs:
     needs: check-pr-exists
     permissions:
       pull-requests: write
-      contents: write
     if: needs.check-pr-exists.outputs.pr_exists == 'false'  # Run only if no PR exists
-    outputs:
-      changes_detected: ${{ steps.check_changes.outputs.changes_detected }}
     steps:
       - name: Check out repository (shallow)
         uses: actions/checkout@v3
@@ -64,7 +61,7 @@ jobs:
           # Check for changes
           if git diff --quiet; then
             echo "No changes detected."
-            echo "::set-output name=changes_detected::false"
+            echo "CHANGES_DETECTED=false" >> $GITHUB_ENV
             exit 0
           fi
 
@@ -84,6 +81,7 @@ jobs:
             exit 1
           fi
           echo "::set-output name=changes_detected::true"
+          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
 
           # Extract TZDATA_VERSION from filename
           TZDATA_VERSION=$(basename "$news_files" .md)
