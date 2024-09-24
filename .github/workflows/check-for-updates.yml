@@ -95,10 +95,10 @@ jobs:
         id: commit_changes
         if: env.CHANGES_DETECTED == 'true'
         run: |
-          # git checkout -b "updates/update_${TZDATA_VERSION}"
+          git checkout -b "updates/update_${TZDATA_VERSION}"
           git commit -m "Update tzdata to version $TZDATA_VERSION" \
                      -m "$TZDATA_NEWS"
-          # git push --force origin "updates/update_${TZDATA_VERSION}"
+          git push --force origin "updates/update_${TZDATA_VERSION}"
 
       - name: Create pull request
         env:
